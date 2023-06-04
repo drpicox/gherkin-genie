@@ -101,3 +101,5 @@ createFeatureFileTests("./Demo.feature", [CucumberSteps]);
 ```
 
 ✨ Done!
+
+![The Gherkin GENIE](GHERKIN_GENIE_LOGO.png)

@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/drpicox/quick-gherkin-steps.git"
+    "url": "git+https://github.com/drpicox/gherkin-genie.git"
   },
   "keywords": [
     "gherkin",
@@ -34,9 +34,9 @@
   "author": "David Rodenas",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/drpicox/quick-gherkin-steps/issues"
+    "url": "https://github.com/drpicox/gherkin-genie/issues"
   },
-  "homepage": "https://github.com/drpicox/quick-gherkin-steps#readme",
+  "homepage": "https://github.com/drpicox/gherkin-genie#readme",
   "devDependencies": {
     "@types/jest": "^29.5.2",
     "jest": "^29.5.0",

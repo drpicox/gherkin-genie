@@ -1,18 +1,18 @@
-# Quick Gherkin Tests
+# <img src="GHERKIN_GENIE_LOGO.png" width="75" height="75"> Gherkin Genie 
 
 > The most simple Gherkin possible.
 > Use your favorite test runner.
 > Zero regular expressions.
 > Code ready to copy and paste.
 
-![DEMO](./DEMO.gif)
+![DEMO](DEMO.gif)
 
 It is time to stop using complex regular expressions and
 wondering which is the best name for our step functions.
-With Quick Gherkin Steps you will be able to quickly use
+With **Gherkin Genie** you will be able to quickly use
 gherkins with minimal effort while avoiding gerkins.
 
-See [examples](./examples) for more details.
+See [examples](examples) for more details.
 
 ## Demo
 

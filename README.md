@@ -14,6 +14,27 @@ gherkins with minimal effort while avoiding gerkins.
 
 See [examples](examples) for more details.
 
+<!-- toc -->
+
+- [How to start](#how-to-start)
+- [Usage](#usage)
+  - [Steps](#steps)
+  - [Numbers](#numbers)
+  - [Strings](#strings)
+  - [Doc Strings](#doc-strings)
+  - [Tables](#tables)
+  - [Scenario Outlines](#scenario-outlines)
+- [Using Other Step Definitions](#using-other-step-definitions)
+  - [Using multiple step definitions](#using-multiple-step-definitions)
+  - [Getting other step definitions](#getting-other-step-definitions)
+  - [Auto-injecting other step definitions](#auto-injecting-other-step-definitions)
+  - [`get` restriction](#get-restriction)
+- [Configuration](#configuration)
+  - [Custom test runners](#custom-test-runners)
+- [Demo](#demo)
+
+<!-- tocstop -->
+
 > Background: this engine provides from the needs for my teachings at the University.
 > Students were struggling with the regular expressions and the step functions,
 > so I decided to create a new approach to the problem.
@@ -64,9 +85,9 @@ yarn test
 
 5. Copy and paste the generated code into your test file. And happy coding!
 
-## Usage
+## Usage
 
-### StepDefinitions
+### Steps
 
 You can create a class with the step definitions:
 
@@ -201,6 +222,259 @@ and the string value is passed as a parameter.
 
 Strings are expected to be always between double quotes, and
 are replaced by `S` in the method name.
+
+### Doc Strings
+
+Doc strings are automatically converted to strings and passed as the parameter:
+
+```feature
+Feature: Blog posts
+
+  Scenario: John creates a post
+    Given a blog post named "Random" with Markdown body
+        """
+        Some Title, Eh?
+        ===============
+        Here is the first paragraph of my blog post. Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit.
+        """
+    Then the blog post should be titled "Random"
+    And the blog post body should contain "Here is the first paragraph"
+```
+
+```ts
+class PostSteps {
+  #title: string;
+  #body: string;
+
+  givenABlogPostNamedSWithMarkdownBody(title: string, docString: string) {
+    this.#title = title;
+    this.#body = docString;
+  }
+
+  thenTheBlogPostShouldBeTitledS(title: string) {
+    expect(this.#title).toBe(title);
+  }
+
+  andTheBlogPostBodyShouldContainS(body: string) {
+    expect(this.#body).toContain(body);
+  }
+}
+```
+
+### Tables
+
+Tables are automatically converted to arrays of objects and passed as the last parameter:
+
+```feature
+Feature: User handles
+
+    Scenario: Users have twitter handles
+        Given the following users exist:
+            | name   | email              | twitter         |
+            | Aslak  | aslak@cucumber.io  | @aslak_hellesoy |
+            | Julien | julien@cucumber.io | @jbpros         |
+            | Matt   | matt@cucumber.io   | @mattwynne      |
+        Then the user "Aslak" should have the twitter handle "@aslak_hellesoy"
+        And the user "Julien" should have the twitter handle "@jbpros"
+        And the user "Matt" should have the twitter handle "@mattwynne"
+```
+
+```ts
+type TableEntry = { name: string; email: string; twitter: string };
+
+class ExampleSteps {
+  #table: TableEntry[];
+
+  givenTheFollowingUsersExist(table: TableEntry[]) {
+    this.#table = table;
+  }
+
+  thenTheUserSShouldHaveTheTwitterHandleS(username: string, twitter: string) {
+    const user = this.#table.find((user) => user.name === username);
+    expect(user!.twitter).toBe(twitter);
+  }
+}
+```
+
+> Please not that TableEntry typing is suggested directly as table parameter type,
+> but for simplicity it has been extracted by a simple IDE refactor to a type alias.
+
+### Scenario Outlines
+
+Scenario outlines are automatically converted to multiple tests:
+
+```feature
+Feature: Scenario Outline
+
+    Scenario Outline: Eating cucumbers
+        Given there are <start> cucumbers
+        When I eat <eat> cucumbers
+        Then I should have <left> cucumbers
+
+        Examples:
+            | start | eat | left |
+            | 12    | 5   | 7    |
+            | 20    | 5   | 15   |
+```
+
+```ts
+class CucumberSteps {
+  #count = 0;
+
+  givenThereAreNCucumbers(count: number) {
+    this.#count = count;
+  }
+
+  whenIEatNCucumbers(eaten: number) {
+    this.#count -= eaten;
+  }
+
+  thenIShouldHaveNCucumbers(left: number) {
+    expect(this.#count).toBe(left);
+  }
+}
+```
+
+Please note that the CucumberSteps class is the same as the one used in the [Numbers](#numbers) section.
+Variables are automatically replaced inside the sentences.
+
+With Scenario Outlines, instead of creating one test, it creates one test per example.
+And it also includes the variable values in the test name:
+
+- `Eating cucumbers — 12, 5, 7`
+- `Eating cucumbers — 20, 5, 15`
+
+## Using Other Step Definitions
+
+In large projects, often one single class implementing all the step definitions is not enough.
+And it also not recommended to have a new class for each feature file.
+But, we can create a collection of own step definitions classes and use them in multiple feature files.
+
+### Using multiple step definitions
+
+You can pass multiple step definitions to the `createFeatureFileTests` function:
+
+```ts
+import { createFeatureFileTests } from "gherkin-genie";
+import { AppleSteps } from "./AppleSteps";
+import { OrangeSteps } from "./OrangeSteps";
+import { FruitSteps } from "./FruitSteps";
+
+createFeatureFileTests("./Fruits.feature", [
+  AppleSteps,
+  OrangeSteps,
+  FruitSteps,
+]);
+```
+
+In this case, the step definitions are merged together.
+
+### Getting other step definitions
+
+You can get the step definitions instances by using the `get` function.
+It allows you to use them in other steps.
+
+For example, given:
+
+```ts
+// "AppleSteps.ts"
+export class AppleSteps {
+  #count: number;
+
+  getCount() {
+    return this.#count;
+  }
+
+  givenIHaveNApples(apples: number) {
+    this.#count = apples;
+  }
+}
+```
+
+Assuming that `OrangeSteps` is similar to `AppleSteps`,
+`FruitSteps` can use them as follows:
+
+```ts
+// "FruitSteps.ts"
+import { get } from "gherkin-genie";
+import { AppleSteps } from "./AppleSteps";
+import { OrangeSteps } from "./OrangeSteps";
+
+class FruitSteps {
+  #appleSteps: AppleSteps;
+  #orangeSteps: OrangeSteps;
+
+  constructor() {
+    this.#appleSteps = get(AppleSteps);
+    this.#orangeSteps = get(OrangeSteps);
+  }
+
+  thenIShouldHaveNFruits(fruits: number) {
+    const appleCount = this.#appleSteps.getCount();
+    const orangeCount = this.#orangeSteps.getCount();
+    expect(appleCount + orangeCount).toBe(fruits);
+  }
+}
+```
+
+### Auto-injecting other step definitions
+
+Although in the first example we have manually injected several
+step definitions classes into the `createFeatureFileTests` function,
+it is possible to auto-inject them.
+
+When the `createFeatureFileTests` function is called,
+it will instance all the step definitions obtained by the `get` function,
+and add them to the list of step definitions.
+
+```feature
+Feature: Fruits
+
+  Scenario: We can mix several fruits
+    Given I have 3 apples
+    And I have 2 oranges
+    Then I should have 5 fruits
+```
+
+```ts
+import { createFeatureFileTests } from "gherkin-genie";
+import { FruitSteps } from "./FruitSteps";
+
+createFeatureFileTests("./Fruits.feature", [FruitSteps]);
+```
+
+Because FruitSteps uses the `get` function to obtain
+the `AppleSteps` and `OrangeSteps` instances,
+their step definitions are automatically injected into the test.
+
+### `get` restriction
+
+The `get` function only works inside the class constructor, and only
+while the class is being instantiated by the `createFeatureFileTests` function.
+
+It is not possible to use the `get` function in the step definitions methods.
+
+```ts
+// ❌ WRONG "FruitSteps.ts"
+import { get } from "gherkin-genie";
+import { AppleSteps } from "./AppleSteps";
+import { OrangeSteps } from "./OrangeSteps";
+
+class FruitSteps {
+  thenIShouldHaveNFruits(fruits: number) {
+    const appleCount = get(AppleSteps).getCount();
+    const orangeCount = get(OrangeSteps).getCount();
+    expect(appleCount + orangeCount).toBe(fruits);
+  }
+}
+```
+
+This will throw an error.
+
+## Configuration
+
+It is possible configure the function `test` to be used to create the tests.
 
 ### Custom test runners
 

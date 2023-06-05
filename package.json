@@ -7,7 +7,8 @@
   "scripts": {
     "test": "jest",
     "prebuild": "rimraf ./types",
-    "build": "yarn build:types",
+    "build": "yarn build:types && yarn build:toc",
+    "build:toc": "markdown-toc -i README.md",
     "build:types": "tsc",
     "prepublishOnly": "yarn test && yarn build"
   },
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.2",
     "jest": "^29.5.0",
+    "markdown-toc": "^1.2.0",
     "rimraf": "^5.0.1",
     "ts-jest": "^29.1.0",
     "typescript": "^5.1.3"

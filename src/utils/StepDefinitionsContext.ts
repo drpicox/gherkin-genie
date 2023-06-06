@@ -1,31 +1,25 @@
-const { StepMethodContext } = require("./StepMethodContext");
+import { ExtendedStep } from "../ExtendedPickle";
+import { StepDefinitions, StepDefinitionsClass } from "../StepDefinitions";
+import { StepMethodContext } from "./StepMethodContext";
 
-/**
- * @template {import("../StepDefinitions").StepDefinitions} T
- * @typedef {(import("../StepDefinitions").StepDefinitionsClass<T>) => T} GetFn
- */
+type GetFn = <T>(stepDefinitionsClass: new () => T) => T;
 
-exports.StepDefinitionsContext = class StepDefinitionsContext {
-  /** @type {{[matchName: string]: StepMethodContext}} */
-  #stepMethods = {};
+export class StepDefinitionsContext {
+  #stepMethods: { [matchName: string]: StepMethodContext } = {};
 
-  /** @type {(() => void | Promise<void>)[]} */
-  #beforeEach = [];
+  #beforeEach: (() => void | Promise<void>)[] = [];
 
-  /** @type {(() => void | Promise<void>)[]} */
-  #afterEach = [];
+  #afterEach: (() => void | Promise<void>)[] = [];
 
-  /** @type {Map<import("../StepDefinitions").StepDefinitionsClass, import("../StepDefinitions").StepDefinitions>} */
-  #instances = new Map();
+  #instances: Map<StepDefinitionsClass, StepDefinitions> = new Map();
 
-  /** @type {import("../StepDefinitions").StepDefinitionsClass[]} */
-  #instanceStack = [];
+  #instanceStack: StepDefinitionsClass[] = [];
 
-  constructor(nestedStepDefinitionsClasses) {
+  constructor(nestedStepDefinitionsClasses: any) {
     StepDefinitionsContext.get = this.#get.bind(this);
 
-    /** @type {import("../StepDefinitions").StepDefinitionsClass[]} */
-    const stepDefinitionsClasses = nestedStepDefinitionsClasses.flat(Infinity);
+    const stepDefinitionsClasses: StepDefinitionsClass[] =
+      nestedStepDefinitionsClasses.flat(Infinity);
 
     stepDefinitionsClasses.forEach((StepDefinitionsClass) =>
       this.#get(StepDefinitionsClass)
@@ -34,8 +28,7 @@ exports.StepDefinitionsContext = class StepDefinitionsContext {
     StepDefinitionsContext.get = null;
   }
 
-  /** @type {GetFn} */
-  static get = null;
+  static get: GetFn | null = null;
 
   getMatchNames() {
     return Object.values(this.#stepMethods).map((stepMethod) =>
@@ -43,13 +36,7 @@ exports.StepDefinitionsContext = class StepDefinitionsContext {
     );
   }
 
-  /**
-   * Runs an step.
-   *
-   * @param {import("../ExtendedPickle").ExtendedStep} step
-   * @returns {Promise<void>}
-   */
-  async runMethod(step, stepArgument) {
+  async runMethod(step: ExtendedStep, stepArgument: any) {
     const stepMethod = this.#stepMethods[step.matchName];
 
     await stepMethod.run(...step.arguments, stepArgument);
@@ -80,7 +67,7 @@ exports.StepDefinitionsContext = class StepDefinitionsContext {
    * @param {new () => T} Constructor
    * @returns {void}
    */
-  #instanceStepDefinitionsClass(Constructor) {
+  #instanceStepDefinitionsClass(Constructor: StepDefinitionsClass) {
     if (this.#instances.has(Constructor)) return;
 
     const instance = new Constructor();
@@ -111,7 +98,7 @@ exports.StepDefinitionsContext = class StepDefinitionsContext {
       this.#afterEach.push(instance.afterEach.bind(instance));
   }
 
-  #get(Constructor) {
+  #get(Constructor: StepDefinitionsClass) {
     if (this.#instanceStack.includes(Constructor))
       throw new Error(
         "Circular dependency detected while creating feature tests: " +
@@ -130,4 +117,4 @@ exports.StepDefinitionsContext = class StepDefinitionsContext {
       this.#instanceStack.pop();
     }
   }
-};
+}

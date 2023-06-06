@@ -2,11 +2,11 @@
   "name": "gherkin-genie",
   "version": "1.0.4",
   "description": "A library to magically create tests from Gherkins.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "typings": "types/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prebuild": "rimraf ./types",
+    "prebuild": "rimraf ./dist",
     "build": "yarn build:types && yarn build:toc",
     "build:toc": "markdown-toc -i README.md",
     "build:types": "tsc",
@@ -26,9 +26,7 @@
     "no-regexp"
   ],
   "files": [
-    "index.js",
-    "src",
-    "types",
+    "dist",
     "examples",
     "tests"
   ],

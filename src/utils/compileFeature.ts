@@ -1,10 +1,8 @@
-exports.compileFeature = compileFeature;
+import { ExtendedPickle } from "../ExtendedPickle";
 
-const Gherkin = require("@cucumber/gherkin");
-const Messages = require("@cucumber/messages");
-const {
-  parseStepAndGenerateArguments,
-} = require("./parseStepAndGenerateArguments");
+import * as Gherkin from "@cucumber/gherkin";
+import * as Messages from "@cucumber/messages";
+import { parseStepAndGenerateArguments } from "./parseStepAndGenerateArguments";
 
 const uuidFn = Messages.IdGenerator.uuid();
 const builder = new Gherkin.AstBuilder(uuidFn);
@@ -15,20 +13,20 @@ const parser = new Gherkin.Parser(builder, matcher);
 /**
  * Generate the pickles for a given feature.
  *
- * @param {string} feature to compile tests for
- * @returns {ReturnType<typeof Gherkin.compile>} the list of pickles
+ * @param feature to compile tests for
+ * @returns  the list of pickles
  */
-function compileFeature(feature) {
+export function compileFeature(feature: string): ExtendedPickle[] {
   const gherkinDocument = parser.parse(feature);
   const pickles = Gherkin.compile(gherkinDocument, "", uuidFn);
 
   const docNodes = getDocNodesById(gherkinDocument);
   enrichPickles(pickles, docNodes);
 
-  return pickles;
+  return pickles as any;
 }
 
-function getDocNodesById(docNode, result = {}) {
+function getDocNodesById(docNode: any, result: any = {}) {
   // nothing to do
   if (typeof docNode !== "object") return result;
 
@@ -48,11 +46,11 @@ function getDocNodesById(docNode, result = {}) {
   return result;
 }
 
-function enrichPickles(pickles, docNodes) {
-  pickles.forEach((pickle) => {
+function enrichPickles(pickles: any, docNodes: any) {
+  pickles.forEach((pickle: any) => {
     const cells = findDocNodeField(docNodes, pickle, "cells");
     if (cells) {
-      pickle.example = cells.map((cell) => cell.value).join(", ");
+      pickle.example = cells.map((cell: any) => cell.value).join(", ");
       pickle.fullName = `${pickle.name} — ${pickle.example}`;
     } else {
       pickle.fullName = pickle.name;
@@ -62,8 +60,8 @@ function enrichPickles(pickles, docNodes) {
   });
 }
 
-function enrichSteps(steps, docNodes) {
-  steps.forEach((step) => {
+function enrichSteps(steps: any, docNodes: any) {
+  steps.forEach((step: any) => {
     const { matchName, args } = parseStepAndGenerateArguments(step.text);
     step.keyword = findDocNodeField(docNodes, step, "keyword");
     step.matchName = matchName;
@@ -71,10 +69,10 @@ function enrichSteps(steps, docNodes) {
   });
 }
 
-function findDocNodeField(nodes, node, fieldName) {
+function findDocNodeField(nodes: any, node: any, fieldName: any) {
   if (!node.astNodeIds) return;
   return node.astNodeIds
-    .map((id) => nodes[id])
-    .map((node) => node && node[fieldName])
+    .map((id: any) => nodes[id])
+    .map((node: any) => node && node[fieldName])
     .find(Boolean);
 }

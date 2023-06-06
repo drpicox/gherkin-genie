@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "..";
+import { createFeatureFileTests } from "../src";
 
 class ExampleSteps {
   #title: string;

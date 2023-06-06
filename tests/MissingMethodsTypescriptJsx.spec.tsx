@@ -1,5 +1,5 @@
-const { createFeatureTests } = require("../index");
-const { createOneStepTest } = require("./utils/createOneStepTest");
+import { createFeatureTests } from "../src/index";
+import { createOneStepTest } from "./utils/createOneStepTest";
 
 describe("when failing from a tsx file", () => {
   test("number arguments add the number type", () => {

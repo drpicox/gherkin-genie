@@ -1,18 +1,23 @@
-exports.createFeatureTests = createFeatureTests;
-
-const { compileFeature } = require("./utils/compileFeature");
-const { configuration } = require("./configuration");
-const { StepsRunner } = require("./utils/StepsRunner");
-const { StepDefinitionsContext } = require("./utils/StepDefinitionsContext");
+import path from "path";
+import { compileFeature } from "./utils/compileFeature";
+import { configuration } from "./configuration";
+import { StepsRunner } from "./utils/StepsRunner";
+import { StepDefinitionsContext } from "./utils/StepDefinitionsContext";
+import { StepDefinitionsClasses } from "./StepDefinitions";
+import { ExtendedPickle } from "./ExtendedPickle";
+import { PickleTable } from "@cucumber/messages";
 
 /**
  * Create the tests for a given Feature.
  *
- * @param {string} feature to create tests for
- * @param {Array<import("./StepDefinitions").StepDefinitionsClasses>} stepDefinitionClasses an array of all the steps constructors classes
- * @returns {void} nothing
+ * @param  feature to create tests for
+ * @param  stepDefinitionClasses an array of all the steps constructors classes
+ * @returns nothing
  */
-function createFeatureTests(feature, stepDefinitionClasses = []) {
+export function createFeatureTests(
+  feature: string,
+  stepDefinitionClasses: StepDefinitionsClasses[] = []
+) {
   const pickles = compileFeature(feature);
   const stepDefinitionsContext = new StepDefinitionsContext(
     stepDefinitionClasses
@@ -29,16 +34,14 @@ function createFeatureTests(feature, stepDefinitionClasses = []) {
   });
 }
 
-/**
- *
- * @param {StepDefinitionsContext} stepDefinitionsContext
- * @param {import("./ExtendedPickle").ExtendedPickle[]} pickles
- */
-function verifySteps(stepDefinitionsContext, pickles) {
+function verifySteps(
+  stepDefinitionsContext: StepDefinitionsContext,
+  pickles: ExtendedPickle[]
+) {
   const validNames = new Set(stepDefinitionsContext.getMatchNames());
-  const isTs = /at.*\.ts(x)?:\d/.test(new Error().stack);
+  const isTs = computeIsTs();
 
-  let missingSteps = [];
+  let missingSteps: string[] = [];
   pickles.forEach((pickle) => {
     pickle.steps.forEach((step) => {
       const { matchName, keyword } = step;
@@ -48,7 +51,7 @@ function verifySteps(stepDefinitionsContext, pickles) {
 
       let number = 1;
       let string = 1;
-      const args = step.arguments.map((arg) => {
+      const args = step.arguments.map((arg: any) => {
         if (typeof arg === "number")
           return `number${number++}${isTs ? ": number" : ""}`;
         if (typeof arg === "string")
@@ -83,8 +86,26 @@ function verifySteps(stepDefinitionsContext, pickles) {
   );
 }
 
-function deduceTableType(table) {
-  const fields = table.rows[0].cells.map((c) => c.value);
-  const types = fields.map((f) => `${f}: string`);
+function deduceTableType(table: PickleTable) {
+  const fields = table.rows[0].cells.map((c: any) => c.value);
+  const types = fields.map((f: any) => `${f}: string`);
   return `{ ${types.join(", ")} }`;
+}
+
+function computeIsTs() {
+  const error = new Error();
+
+  const errorStackArray = error.stack.split("\n");
+  const entries = errorStackArray
+    .map((stackLine) => stackLine.match(/\((.*):\d+:\d+\)/)?.[1])
+    .filter(Boolean)
+    .map((filePath) => ({
+      path: path.dirname(filePath),
+      type: filePath.split(".").pop(),
+    }));
+
+  const discardPath = entries[0].path;
+  while (entries[0].path === discardPath) entries.shift();
+
+  return !!entries.find((entry) => entry.type === "ts" || entry.type === "tsx");
 }

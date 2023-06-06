@@ -1,11 +1,6 @@
-const { StepDefinitionsContext } = require("./utils/StepDefinitionsContext");
+import { StepDefinitionsContext } from "./utils/StepDefinitionsContext";
 
-/**
- * @template T
- * @param {new () => T} stepDefinitionsClass
- * @returns {T}
- */
-exports.get = function get(stepDefinitionsClass) {
+export function get<T>(stepDefinitionsClass: new () => T): T {
   const contextGet = StepDefinitionsContext.get;
 
   if (!contextGet)
@@ -14,4 +9,4 @@ exports.get = function get(stepDefinitionsClass) {
     );
 
   return contextGet(stepDefinitionsClass);
-};
+}

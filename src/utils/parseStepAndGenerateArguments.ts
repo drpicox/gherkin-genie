@@ -1,12 +1,13 @@
-exports.parseStepAndGenerateArguments = parseStepAndGenerateArguments;
-
 /**
  * Converts a step string into a function name and arguments.
  *
- * @param {string} stepStr
- * @returns {{matchName: string, args: (string | number)[]}} the function name and arguments
+ * @param stepStr
+ * @returns  the function name and arguments
  */
-function parseStepAndGenerateArguments(stepStr) {
+export function parseStepAndGenerateArguments(stepStr: string): {
+  matchName: string;
+  args: (string | number)[];
+} {
   // Function name generation
   const words = stepStr.match(/\b(\w+)\b|"[^"]+"/g);
   const matchName = words.reduce((acc, word) => {
@@ -21,7 +22,7 @@ function parseStepAndGenerateArguments(stepStr) {
   }, "");
 
   // Argument extraction
-  const args = [];
+  const args: (string | number)[] = [];
   const numbersAndStrings = stepStr.match(/\b\d+\b|"[^"]+"/g);
   if (numbersAndStrings) {
     numbersAndStrings.forEach((element) => {

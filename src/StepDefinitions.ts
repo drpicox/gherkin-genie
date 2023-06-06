@@ -5,6 +5,7 @@ export type StepMethod = (
 export interface StepDefinitions {
   beforeEach?: () => void | Promise<void>;
   afterEach?: () => void | Promise<void>;
+  [key: string]: ((...args: any[]) => void | Promise<void>) | undefined;
 }
 
 export type StepDefinitionsClass = new () => any;

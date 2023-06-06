@@ -1,19 +1,16 @@
-/** @typedef {import("@cucumber/gherkin")} Gherkin */
-/** @typedef {import("./StepDefinitionsContext").StepsInstances} StepsInstances */
+import { StepDefinitionsContext } from "./StepDefinitionsContext";
+import { ExtendedPickle, ExtendedStep } from "../ExtendedPickle";
 
 const chalk = require("chalk");
 
-exports.StepsRunner = class StepsRunner {
-  /** @type {StepsInstances} */
-  #stepsInstances;
+export class StepsRunner {
+  #stepsInstances: StepDefinitionsContext;
 
-  /** @param {StepsInstances} stepsInstances */
-  constructor(stepsInstances) {
+  constructor(stepsInstances: StepDefinitionsContext) {
     this.#stepsInstances = stepsInstances;
   }
 
-  /** @param {import("../ExtendedPickle").ExtendedPickle} pickle */
-  async run(pickle) {
+  async run(pickle: ExtendedPickle) {
     let firstError;
     let stepIndex = -1;
 
@@ -54,7 +51,7 @@ exports.StepsRunner = class StepsRunner {
     }
   }
 
-  #decorateError(error, pickle, stepIndex) {
+  #decorateError(error: Error, pickle: ExtendedPickle, stepIndex: number) {
     if (!error.stack) return;
 
     let prettyError = "\n";
@@ -74,17 +71,17 @@ exports.StepsRunner = class StepsRunner {
     error.stack = `${prettyError}\n${error.stack}`;
   }
 
-  #parseDataTable(step) {
+  #parseDataTable(step: ExtendedStep) {
     const dataRows = step.argument.dataTable.rows;
-    const dataHeader = dataRows[0].cells.map((cell) => cell.value);
+    const dataHeader = dataRows[0].cells.map((cell: any) => cell.value);
     const dataValues = dataRows
       .slice(1)
-      .map((row) => row.cells.map((cell) => cell.value));
+      .map((row: any) => row.cells.map((cell: any) => cell.value));
 
     const table = [];
     for (let i = 0; i < dataValues.length; i++) {
       const row = dataValues[i];
-      const rowObject = {};
+      const rowObject: any = {};
       for (let j = 0; j < row.length; j++) {
         const cell = row[j];
         rowObject[dataHeader[j]] = cell;
@@ -94,9 +91,9 @@ exports.StepsRunner = class StepsRunner {
 
     return table;
   }
-};
+}
 
-function formatKeyword(keyword) {
+function formatKeyword(keyword: string) {
   while (keyword.length < 6) keyword += " ";
   return keyword;
 }

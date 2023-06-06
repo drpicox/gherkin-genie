@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "..";
+import { createFeatureFileTests } from "../src";
 
 type TableEntry = { name: string; email: string; twitter: string };
 

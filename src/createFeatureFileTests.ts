@@ -1,17 +1,19 @@
-const { readFileSync } = require("fs");
-const path = require("path");
-const { createFeatureTests } = require("./createFeatureTests");
+import { readFileSync } from "fs";
+import path from "path";
+import { createFeatureTests } from "./createFeatureTests";
 
 /**
  * Create the tests for a given Feature file.
  *
- * @param {string} featurePath file path of the feature to create tests for
- * @param {Array<import("./StepDefinitions").StepDefinitionsClasses>} stepDefinitionClasses an array of all the steps constructors classes
- * @returns {void} nothing
+ * @param featurePath file path of the feature to create tests for
+ * @param stepDefinitionClasses an array of all the steps constructors classes
+ * @returns nothing
  */
-exports.createFeatureFileTests = function createFeatureFileTests(
-  featurePath,
-  stepDefinitionClasses = []
+export function createFeatureFileTests(
+  featurePath: string,
+  stepDefinitionClasses: Array<
+    import("./StepDefinitions").StepDefinitionsClasses
+  > = []
 ) {
   if (featurePath.startsWith("./") || featurePath.startsWith("../")) {
     featurePath = getAbsolutePath(featurePath);
@@ -19,9 +21,9 @@ exports.createFeatureFileTests = function createFeatureFileTests(
 
   const feature = readFileSync(featurePath, "utf8");
   createFeatureTests(feature, stepDefinitionClasses);
-};
+}
 
-function getAbsolutePath(relativePath) {
+function getAbsolutePath(relativePath: string) {
   // Get the stack trace
   const stackTrace = new Error().stack.split("\n");
 

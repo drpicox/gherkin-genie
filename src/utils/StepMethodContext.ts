@@ -1,25 +1,23 @@
-class StepMethodContext {
-  /** @type {string} */
-  #matchName;
+import { StepDefinitions } from "../StepDefinitions";
 
-  /** @type {string} */
-  #methodName;
+export class StepMethodContext {
+  #matchName: string;
 
-  /** @type {import("../StepDefinitions").StepDefinitions} */
-  #stepDefinitions;
+  #methodName: string;
 
-  /**
-   * @param {string} matchName
-   * @param {string} methodName
-   * @param {import("../StepDefinitions").StepDefinitionsClass} stepDefinitions
-   */
-  constructor(matchName, methodName, stepDefinitions) {
+  #stepDefinitions: StepDefinitions;
+
+  constructor(
+    matchName: string,
+    methodName: string,
+    stepDefinitions: StepDefinitions
+  ) {
     this.#matchName = matchName;
     this.#methodName = methodName;
     this.#stepDefinitions = stepDefinitions;
   }
 
-  async run(...args) {
+  async run(...args: any[]) {
     return this.#stepDefinitions[this.#methodName](...args);
   }
 
@@ -29,10 +27,8 @@ class StepMethodContext {
 
   /**
    * Throws an error because the step method is already defined.
-   *
-   * @param {StepMethodContext} existing
    */
-  throwConflictError(existing) {
+  throwConflictError(existing: StepMethodContext) {
     const matchName = this.#matchName;
 
     const aClassName = existing.#stepDefinitions.constructor.name;
@@ -51,4 +47,3 @@ class StepMethodContext {
     );
   }
 }
-exports.StepMethodContext = StepMethodContext;

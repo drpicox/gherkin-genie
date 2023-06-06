@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "..";
+import { createFeatureFileTests } from "../src";
 import { get } from "../src/get";
 
 class AppleSteps {

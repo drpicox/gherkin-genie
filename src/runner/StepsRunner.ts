@@ -1,5 +1,6 @@
-import { StepDefinitionsContext } from "./StepDefinitionsContext";
-import { ExtendedPickle, ExtendedStep } from "../ExtendedPickle";
+import { StepDefinitionsContext } from "../injector/StepDefinitionsContext";
+import { ExtendedPickle } from "../features/ExtendedPickle";
+import { ExtendedStep } from "../features/ExtendedStep";
 
 const chalk = require("chalk");
 

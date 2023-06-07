@@ -12,18 +12,20 @@ import { createFeatureTests } from "./createFeatureTests";
 export function createFeatureFileTests(
   featurePath: string,
   stepDefinitionClasses: Array<
-    import("./StepDefinitions").StepDefinitionsClasses
+    import("../runner/StepDefinitions").StepDefinitionsClasses
   > = []
 ) {
-  if (featurePath.startsWith("./") || featurePath.startsWith("../")) {
-    featurePath = getAbsolutePath(featurePath);
-  }
-
+  featurePath = getAbsolutePath(featurePath);
   const feature = readFileSync(featurePath, "utf8");
+
   createFeatureTests(feature, stepDefinitionClasses);
 }
 
 function getAbsolutePath(relativePath: string) {
+  const isAlreadyAbsolute =
+    !relativePath.startsWith("./") && !relativePath.startsWith("../");
+  if (isAlreadyAbsolute) return relativePath;
+
   // Get the stack trace
   const stackTrace = new Error().stack.split("\n");
 

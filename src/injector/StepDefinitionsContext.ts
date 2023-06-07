@@ -1,5 +1,8 @@
-import { ExtendedStep } from "../ExtendedPickle";
-import { StepDefinitions, StepDefinitionsClass } from "../StepDefinitions";
+import { ExtendedStep } from "../features/ExtendedStep";
+import {
+  StepDefinitions,
+  StepDefinitionsClass,
+} from "../runner/StepDefinitions";
 import { StepMethodContext } from "./StepMethodContext";
 
 type GetFn = <T>(stepDefinitionsClass: new () => T) => T;

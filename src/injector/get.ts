@@ -1,4 +1,4 @@
-import { StepDefinitionsContext } from "./utils/StepDefinitionsContext";
+import { StepDefinitionsContext } from "./StepDefinitionsContext";
 
 export function get<T>(stepDefinitionsClass: new () => T): T {
   const contextGet = StepDefinitionsContext.get;

@@ -1,4 +1,4 @@
-import { ExtendedPickle } from "../ExtendedPickle";
+import { ExtendedPickle } from "../features/ExtendedPickle";
 
 import * as Gherkin from "@cucumber/gherkin";
 import * as Messages from "@cucumber/messages";

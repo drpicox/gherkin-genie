@@ -1,5 +1,4 @@
-import { createFeatureFileTests } from "../src";
-import { get } from "../src/get";
+import { createFeatureFileTests, get } from "../src";
 
 class AppleSteps {
   #count: number;

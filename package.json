@@ -6,7 +6,8 @@
   "typings": "types/index.d.ts",
   "scripts": {
     "test": "jest",
-    "prebuild": "rimraf ./dist",
+    "clean": "rimraf ./dist",
+    "prebuild": "yarn clean",
     "build": "yarn build:types && yarn build:toc",
     "build:toc": "markdown-toc -i README.md",
     "build:types": "tsc",

@@ -1,9 +1,9 @@
 import path from "path";
-import { compileFeature } from "./utils/compileFeature";
-import { configuration } from "./configuration";
-import { StepsRunner } from "./utils/StepsRunner";
-import { StepDefinitionsContext } from "./utils/StepDefinitionsContext";
-import { StepDefinitionsClasses } from "./StepDefinitions";
+import { compileFeature } from "./compileFeature";
+import { configuration } from "../configuration";
+import { StepsRunner } from "../runner/StepsRunner";
+import { StepDefinitionsContext } from "../injector/StepDefinitionsContext";
+import { StepDefinitionsClasses } from "../runner/StepDefinitions";
 import { ExtendedPickle } from "./ExtendedPickle";
 import { PickleTable } from "@cucumber/messages";
 

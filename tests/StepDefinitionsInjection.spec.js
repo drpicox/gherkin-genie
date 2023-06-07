@@ -1,4 +1,4 @@
-const { createFeatureTests, get } = require("../index");
+const { createFeatureTests, wish } = require("../index");
 const { createOneStepTest } = require("./utils/createOneStepTest");
 const { configureMockTest } = require("./utils/configureMockTest");
 
@@ -46,8 +46,8 @@ test("can get other step instances", async () => {
     #bananasSteps;
 
     constructor() {
-      this.#applesSteps = get(ApplesSteps);
-      this.#bananasSteps = get(BananasSteps);
+      this.#applesSteps = wish(ApplesSteps);
+      this.#bananasSteps = wish(BananasSteps);
     }
 
     thenIShouldHaveNFruits(expected) {
@@ -91,8 +91,8 @@ test("it instances StepDefinitionClasses not added but getted", async () => {
     #bananasSteps;
 
     constructor() {
-      this.#applesSteps = get(ApplesSteps);
-      this.#bananasSteps = get(BananasSteps);
+      this.#applesSteps = wish(ApplesSteps);
+      this.#bananasSteps = wish(BananasSteps);
     }
 
     thenIShouldHaveNFruits(expected) {
@@ -119,8 +119,8 @@ test("it instances StepDefinitionClasses not added but getted", async () => {
 test("cannot use get outside a constructor", () => {
   class ApplesSteps {}
 
-  expect(() => get(ApplesSteps)).toThrow(
-    "You can only use get() inside a StepDefinitionsClass constructor"
+  expect(() => wish(ApplesSteps)).toThrow(
+    /You can only .* inside a StepDefinitionsClass constructor/
   );
 });
 
@@ -128,12 +128,12 @@ test("cannot use get before creating tests", () => {
   class ApplesSteps {}
   class FruitSteps {
     constructor() {
-      get(ApplesSteps);
+      wish(ApplesSteps);
     }
   }
 
   expect(() => new FruitSteps()).toThrow(
-    /You can only use get\(\) .* while creating feature tests/
+    /You can only .* while creating feature tests/
   );
 });
 
@@ -141,20 +141,20 @@ test("cannot use get after creating tests", () => {
   class ApplesSteps {}
 
   createFeatureTests("", [ApplesSteps]);
-  expect(() => get(ApplesSteps)).toThrow(
-    /You can only use get\(\) .* while creating feature tests/
+  expect(() => wish(ApplesSteps)).toThrow(
+    /You can only .* while creating feature tests/
   );
 });
 
 test("cannot get with circular dependencies", () => {
   class ApplesSteps {
     constructor() {
-      get(BananasSteps);
+      wish(BananasSteps);
     }
   }
   class BananasSteps {
     constructor() {
-      get(ApplesSteps);
+      wish(ApplesSteps);
     }
   }
 
@@ -169,7 +169,7 @@ test("cannot get with circular dependencies", () => {
 test("cannot get itself", () => {
   class ApplesSteps {
     constructor() {
-      get(ApplesSteps);
+      wish(ApplesSteps);
     }
   }
 

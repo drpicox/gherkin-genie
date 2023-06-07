@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "../src";
+import { wish } from "../src";
 
 class ExampleSteps {
   #favoriteColors: { [user: string]: string } = {};
@@ -20,4 +20,4 @@ class ExampleSteps {
   }
 }
 
-createFeatureFileTests("./StepArgumentStrings.feature", [ExampleSteps]);
+wish("./StepArgumentStrings.feature", [ExampleSteps]);

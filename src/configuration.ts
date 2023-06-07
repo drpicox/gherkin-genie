@@ -1,4 +1,7 @@
-type TestFn = (feature: string, test: () => void | Promise<void>) => void;
+export type TestFn = (
+  feature: string,
+  test: () => void | Promise<void>
+) => void;
 
 export const configuration = new (class Configuration {
   #testFn: TestFn = global.test;
@@ -9,5 +12,9 @@ export const configuration = new (class Configuration {
 
   setTestFn(testFn: TestFn) {
     this.#testFn = testFn;
+  }
+
+  wish({ testFn }: { testFn: TestFn }) {
+    this.setTestFn(testFn);
   }
 })();

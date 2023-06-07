@@ -27,7 +27,7 @@ test("create tests fails and reports missing steps", () => {
   const actualError = error.message;
 
   expect(actualError).toMatch(/missing steps/s);
-  expect(actualError).toMatch(/class MissingSteps \{.*\}/s);
+  expect(actualError).toMatch(/class WishedSteps \{.*\}/s);
   expect(actualError).toMatch(
     /whenMissingStep\(\) \{\s*throw new Error\(\"Unimplemented\"\);\s*\}/s
   );

@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "../src";
+import { wish } from "../src";
 
 type TableEntry = { name: string; email: string; twitter: string };
 
@@ -15,4 +15,4 @@ class ExampleSteps {
   }
 }
 
-createFeatureFileTests("./StepArgumentTables.feature", [ExampleSteps]);
+wish("./StepArgumentTables.feature", [ExampleSteps]);

@@ -1,10 +1,10 @@
-const { configuration } = require("../../index");
+const { wish } = require("../../index");
 
 exports.configureMockTest = configureMockTest;
 
 function configureMockTest() {
   const mockTests = new MockTests();
-  configuration.setTestFn(mockTests.test.bind(mockTests));
+  wish({ testFn: mockTests.test.bind(mockTests) });
   return mockTests;
 }
 

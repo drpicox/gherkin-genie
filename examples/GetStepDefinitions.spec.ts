@@ -1,4 +1,4 @@
-import { createFeatureFileTests, get } from "../src";
+import { wish } from "../src";
 
 class AppleSteps {
   #count: number;
@@ -29,8 +29,8 @@ class FruitSteps {
   #orangeSteps: OrangeSteps;
 
   constructor() {
-    this.#appleSteps = get(AppleSteps);
-    this.#orangeSteps = get(OrangeSteps);
+    this.#appleSteps = wish(AppleSteps);
+    this.#orangeSteps = wish(OrangeSteps);
   }
 
   thenIShouldHaveNFruits(fruits: number) {
@@ -41,17 +41,13 @@ class FruitSteps {
 }
 
 // Having all steps in one array
-createFeatureFileTests("./GetStepDefinitions.feature", [
-  AppleSteps,
-  OrangeSteps,
-  FruitSteps,
-]);
+wish("./GetStepDefinitions.feature", [AppleSteps, OrangeSteps, FruitSteps]);
 
 // Having steps grouped in arrays
 const appleSteps = [AppleSteps];
 const orangeSteps = [OrangeSteps];
 const fruitSteps = [FruitSteps, appleSteps, orangeSteps];
-createFeatureFileTests("./GetStepDefinitions.feature", [fruitSteps]);
+wish("./GetStepDefinitions.feature", [fruitSteps]);
 
 // Letting get to automatically find steps
-createFeatureFileTests("./GetStepDefinitions.feature", [FruitSteps]);
+wish("./GetStepDefinitions.feature", [FruitSteps]);

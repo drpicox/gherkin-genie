@@ -1,3 +1,4 @@
+export { wish } from "./wish";
 export { createFeatureFileTests } from "./features/createFeatureFileTests";
 export { createFeatureTests } from "./features/createFeatureTests";
 export { get } from "./injector/get";

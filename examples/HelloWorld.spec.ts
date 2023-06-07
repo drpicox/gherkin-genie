@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "../src";
+import { wish } from "../src";
 
 class HelloWorldSteps {
   #message: string;
@@ -12,4 +12,4 @@ class HelloWorldSteps {
   }
 }
 
-createFeatureFileTests("examples/HelloWorld.feature", [HelloWorldSteps]);
+wish("examples/HelloWorld.feature", [HelloWorldSteps]);

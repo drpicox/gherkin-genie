@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "../src";
+import { wish } from "../src";
 
 class ExampleSteps {
   #title: string;
@@ -18,4 +18,4 @@ class ExampleSteps {
   }
 }
 
-createFeatureFileTests("./StepArgumentDocStrings.feature", [ExampleSteps]);
+wish("./StepArgumentDocStrings.feature", [ExampleSteps]);

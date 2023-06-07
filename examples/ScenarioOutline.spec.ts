@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "../src";
+import { wish } from "../src";
 
 class ScenarioOutlineSteps {
   #cucumbers: number;
@@ -16,4 +16,4 @@ class ScenarioOutlineSteps {
   }
 }
 
-createFeatureFileTests("./ScenarioOutline.feature", [ScenarioOutlineSteps]);
+wish("./ScenarioOutline.feature", [ScenarioOutlineSteps]);

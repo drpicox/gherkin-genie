@@ -3,7 +3,7 @@ import { compileFeature } from "./compileFeature";
 import { configuration } from "../configuration";
 import { StepsRunner } from "../runner/StepsRunner";
 import { StepDefinitionsContext } from "../injector/StepDefinitionsContext";
-import { StepDefinitionsClasses } from "../runner/StepDefinitions";
+import { StepDefinitionsClasses } from "../StepDefinitions";
 import { ExtendedPickle } from "./ExtendedPickle";
 import { PickleTable } from "@cucumber/messages";
 
@@ -79,7 +79,7 @@ function verifySteps(
     [
       "There are missing steps. Please implement them:",
       "",
-      "class MissingSteps {",
+      "class WishedSteps {",
       missingSteps.join("\n\n"),
       "}",
     ].join("\n")

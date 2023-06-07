@@ -1,4 +1,4 @@
-import { createFeatureFileTests } from "../src";
+import { wish } from "../src";
 
 class ExampleSteps {
   #cucumbers: number;
@@ -16,4 +16,4 @@ class ExampleSteps {
   }
 }
 
-createFeatureFileTests("./StepArgumentNumbers.feature", [ExampleSteps]);
+wish("./StepArgumentNumbers.feature", [ExampleSteps]);

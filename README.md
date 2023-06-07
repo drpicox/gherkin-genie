@@ -16,9 +16,11 @@ See [examples](examples) for more details.
 
 <!-- toc -->
 
-- [How to start](#how-to-start)
+- [Setup](#setup)
+- [Quick Start](#quick-start)
+- [Three wishes 🧞‍♂️](#three-wishes-%F0%9F%A7%9E%E2%80%8D%E2%99%82%EF%B8%8F)
 - [Usage](#usage)
-  * [Steps](#steps)
+  * [Step methods](#step-methods)
   * [Numbers](#numbers)
   * [Strings](#strings)
   * [Doc Strings](#doc-strings)
@@ -43,13 +45,13 @@ See [examples](examples) for more details.
 > have improved their skills thanks to this tool.
 > See https://github.com/drpicox/classroom--cards-game--2022.
 
-## How to start
+## Setup
 
-0. You already have a test runner like Jest.
+1. You already have a test runner like Jest.
 
 > Your test runner does not work by default? Leave an issue and see [Custom test runners](#custom-test-runners).
 
-1. Install the package:
+2. Install the package:
 
 ```bash
 npm install --save-dev gherkin-genie
@@ -61,17 +63,7 @@ or with yarn:
 yarn add --dev gherkin-genie
 ```
 
-2. Create a feature file: Create them into your project and start writing your features.
-
-3. Import the `createFeatureFileTests` function and call it with the path to your feature file:
-
-```ts
-import { createFeatureFileTests } from "gherkin-genie";
-
-createFeatureFileTests("./Demo.feature");
-```
-
-4. Run your tests:
+3. Run your tests:
 
 ```bash
 npm test
@@ -83,13 +75,9 @@ Or
 yarn test
 ```
 
-5. Copy and paste the generated code into your test file. And happy coding!
+## Quick Start
 
-## Usage
-
-### Steps
-
-You can create a class with the step definitions:
+1. Create a file with your feature file.
 
 ```feature
 # HelloWorld.feature
@@ -101,7 +89,39 @@ Feature: Hello World
         Then I should see the Hello World
 ```
 
+2. Create the test that wishes to run these feature file:
+
 ```ts
+// HelloWorld.spec.js
+import { wish } from "gherkin-genie";
+
+wish("./HelloWorld.feature");
+```
+
+3. Run the tests and look at the output:
+
+```bash
+    There are missing steps. Please implement them:
+
+    class WishedSteps {
+      givenIAmRunningAGherkinTest() {
+        throw new Error("Unimplemented");
+      }
+
+      whenIRunTheTest() {
+        throw new Error("Unimplemented");
+      }
+
+      thenIShouldSeeTheHelloWorld() {
+        throw new Error("Unimplemented");
+      }
+    }
+```
+
+4. Copy and paste them to your file, and implement:
+
+```ts
+// HelloWorldSteps.js
 class HelloWorldSteps {
   givenIAmRunningAGherkinTest() {
     // ...
@@ -115,14 +135,48 @@ class HelloWorldSteps {
 }
 ```
 
-And pass it to the `createFeatureFileTests` function:
+5. And pass to your wish:
 
 ```ts
-import { createFeatureFileTests } from "gherkin-genie";
+// HelloWorld.spec.js
+import { wish } from "gherkin-genie";
 import { HelloWorldSteps } from "./HelloWorldSteps";
 
-createFeatureFileTests("./HelloWorld.feature", [HelloWorldSteps]);
+wish("./HelloWorld.feature", [HelloWorldSteps]);
 ```
+
+## Three wishes 🧞‍♂️
+
+The API is ready to grant three wishes:
+
+1. Create the tests for a feature file:
+
+```js
+wish(featureFilePath, [stepsDefinitions]);
+```
+
+2. [Get instances of other stepDefinitions](#getting-other-step-definitions) (aka injection):
+
+```js
+const instance = wish(StepDefinitionsClass);
+```
+
+3. [Configure your runner test function](custom-test-runners)
+
+```js
+wish({ testFn: runner.test });
+```
+
+> There is the classic api with a different method
+> more specific for each functionality:
+>
+> - wish
+> - get
+> - configuration.setTestFn
+
+## Usage
+
+### Step methods
 
 It automatically creates the tests and the gherkin matchers for you.
 It creates a test named `Running a Gherkin test`
@@ -353,19 +407,15 @@ But, we can create a collection of own step definitions classes and use them in 
 
 ### Using multiple step definitions
 
-You can pass multiple step definitions to the `createFeatureFileTests` function:
+You can pass multiple step definitions to the `wish` function:
 
 ```ts
-import { createFeatureFileTests } from "gherkin-genie";
+import { wish } from "gherkin-genie";
 import { AppleSteps } from "./AppleSteps";
 import { OrangeSteps } from "./OrangeSteps";
 import { FruitSteps } from "./FruitSteps";
 
-createFeatureFileTests("./Fruits.feature", [
-  AppleSteps,
-  OrangeSteps,
-  FruitSteps,
-]);
+wish("./Fruits.feature", [AppleSteps, OrangeSteps, FruitSteps]);
 ```
 
 In this case, the step definitions are merged together.
@@ -406,8 +456,8 @@ class FruitSteps {
   #orangeSteps: OrangeSteps;
 
   constructor() {
-    this.#appleSteps = get(AppleSteps);
-    this.#orangeSteps = get(OrangeSteps);
+    this.#appleSteps = wish(AppleSteps);
+    this.#orangeSteps = wish(OrangeSteps);
   }
 
   thenIShouldHaveNFruits(fruits: number) {
@@ -420,11 +470,14 @@ class FruitSteps {
 
 ### Auto-injecting other step definitions
 
+You do not need to give all the step definitions to the feature
+test creations, they are added when wishing for them.
+
 Although in the first example we have manually injected several
-step definitions classes into the `createFeatureFileTests` function,
+step definitions classes into the `wish` function,
 it is possible to auto-inject them.
 
-When the `createFeatureFileTests` function is called,
+When the `wish` function is called,
 it will instance all the step definitions obtained by the `get` function,
 and add them to the list of step definitions.
 
@@ -438,10 +491,10 @@ Feature: Fruits
 ```
 
 ```ts
-import { createFeatureFileTests } from "gherkin-genie";
+import { wish } from "gherkin-genie";
 import { FruitSteps } from "./FruitSteps";
 
-createFeatureFileTests("./Fruits.feature", [FruitSteps]);
+wish("./Fruits.feature", [FruitSteps]);
 ```
 
 Because FruitSteps uses the `get` function to obtain
@@ -451,7 +504,7 @@ their step definitions are automatically injected into the test.
 ### `get` restriction
 
 The `get` function only works inside the class constructor, and only
-while the class is being instantiated by the `createFeatureFileTests` function.
+while the class is being instantiated by the `wish` function.
 
 It is not possible to use the `get` function in the step definitions methods.
 
@@ -463,8 +516,8 @@ import { OrangeSteps } from "./OrangeSteps";
 
 class FruitSteps {
   thenIShouldHaveNFruits(fruits: number) {
-    const appleCount = get(AppleSteps).getCount();
-    const orangeCount = get(OrangeSteps).getCount();
+    const appleCount = wish(AppleSteps).getCount();
+    const orangeCount = wish(OrangeSteps).getCount();
     expect(appleCount + orangeCount).toBe(fruits);
   }
 }
@@ -483,13 +536,13 @@ By default, **Gherkin Genie** uses the global `test` to create the tests.
 If your test runner does not work by default,
 because it uses a different name for the test function,
 or it expects you to import it,
-you can configure it by passing a function to the `configuration.setTestFn` function:
+you can configure it by passing a function to the `wish({ testFn })` function:
 
 ```ts
 import test from "ava";
-import { configuration } from "gherkin-genie";
+import { wish } from "gherkin-genie";
 
-configuration.setTestFn(test);
+wish({ testFn: test });
 ```
 
 ## Demo
@@ -508,9 +561,9 @@ Feature: Magic of Disappearing Cucumbers
 Initial test:
 
 ```ts
-import { createFeatureFileTests } from "gherkin-genie";
+import { wish } from "gherkin-genie";
 
-createFeatureFileTests("./Demo.feature");
+wish("./Demo.feature");
 ```
 
 Error message:
@@ -521,7 +574,7 @@ Error message:
 
     There are missing steps. Please implement them:
 
-    class MissingSteps {
+    class WishedSteps {
       givenIHaveNCucumbers(number1: number) {
         throw new Error("Unimplemented");
       }
@@ -545,7 +598,7 @@ Error message:
 
       at verifySteps (src/createFeatureTests.js:75:9)
       at createFeatureTests (src/createFeatureTests.js:21:3)
-      at createFeatureFileTests (src/createFeatureFileTests.js:21:3)
+      at wish (src/wish.js:21:3)
       at Object.<anonymous> (demo/Demo.spec.ts:19:23)
 
 Test Suites: 1 failed, 1 total
@@ -557,7 +610,7 @@ Time:        0.16 s, estimated 1 s
 Copy paste and fix implementation:
 
 ```ts
-import { createFeatureFileTests } from "gherkin-genie";
+import { wish } from "gherkin-genie";
 
 class CucumberSteps {
   #count = 0;
@@ -575,7 +628,7 @@ class CucumberSteps {
   }
 }
 
-createFeatureFileTests("./Demo.feature", [CucumberSteps]);
+wish("./Demo.feature", [CucumberSteps]);
 ```
 
 ✨ Done!

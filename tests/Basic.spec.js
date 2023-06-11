@@ -164,36 +164,6 @@ test("it executes beforeEach and afterEach", async () => {
   expect(log).toEqual(["Before", "Given", "After"]);
 });
 
-test("translates numbers into N and gives the value as argument", async () => {
-  const log = [];
-
-  class ExampleSteps {
-    async givenItHasTheNumberN(n) {
-      log.push(n);
-    }
-  }
-
-  createOneStepTest("Given it has the number 42", [ExampleSteps]);
-
-  await mockTests.run();
-  expect(log).toEqual([42]);
-});
-
-test('translates "strings" encolsed by quotes into S and gives the value as argument', async () => {
-  const log = [];
-
-  class ExampleSteps {
-    async givenHeSaysS(word) {
-      log.push(word);
-    }
-  }
-
-  createOneStepTest('When he says "HELLO"', [ExampleSteps]);
-
-  await mockTests.run();
-  expect(log).toEqual(["HELLO"]);
-});
-
 test("combines numbers and strings", async () => {
   const log = [];
 

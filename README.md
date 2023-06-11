@@ -170,7 +170,7 @@ wish({ testFn: runner.test });
 > There is the classic api with a different method
 > more specific for each functionality:
 >
-> - wish
+> - createFeatureFileTests
 > - get
 > - configuration.setTestFn
 

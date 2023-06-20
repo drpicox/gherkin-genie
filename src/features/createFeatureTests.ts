@@ -1,11 +1,15 @@
 import path from "path";
+import { PickleTable } from "@cucumber/messages";
 import { compileFeature } from "./compileFeature";
 import { configuration } from "../configuration";
 import { StepsRunner } from "../runner/StepsRunner";
-import { StepDefinitionsContext } from "../injector/StepDefinitionsContext";
+import {
+  StepDefinitionsContext,
+  currentInjectionContext,
+  ErrorInjectionsContext,
+} from "../injector";
 import { StepDefinitionsClasses } from "../StepDefinitions";
 import { ExtendedPickle } from "./ExtendedPickle";
-import { PickleTable } from "@cucumber/messages";
 
 /**
  * Create the tests for a given Feature.
@@ -19,8 +23,13 @@ export function createFeatureTests(
   stepDefinitionClasses: StepDefinitionsClasses[] = []
 ) {
   const pickles = compileFeature(feature);
-  const stepDefinitionsContext = new StepDefinitionsContext(
-    stepDefinitionClasses
+  const stepDefinitionsContext = new StepDefinitionsContext();
+  currentInjectionContext.setCurrent(stepDefinitionsContext);
+  stepDefinitionsContext.getAll(stepDefinitionClasses);
+  currentInjectionContext.setCurrent(
+    new ErrorInjectionsContext(
+      "You can only wish for getting other StepDefinitions instances inside a StepDefinitionsClass constructor while creating feature tests"
+    )
   );
 
   verifySteps(stepDefinitionsContext, pickles);

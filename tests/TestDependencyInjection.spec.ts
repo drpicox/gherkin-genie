@@ -113,7 +113,7 @@ test("each tests have different non-steps injections", async () => {
   await mockTests.run();
 
   expect(instances.length).toBe(2);
-  expect(instances[0]).toBe(instances[1]);
+  expect(instances[0]).not.toBe(instances[1]);
 });
 
 test("steps injected during tests do not handle steps", () => {
@@ -138,37 +138,6 @@ test("steps injected during tests do not handle steps", () => {
       [AppleSteps]
     );
   }).toThrow(/There are missing steps/i);
-});
-
-test("steps intances injected during tests end with the test", async () => {
-  const instances: OtherSteps[] = [];
-
-  class OtherSteps {
-    givenISayHelloAgain() {}
-  }
-
-  class HelloSteps {
-    givenISayHello() {
-      instances.push(wish(OtherSteps));
-    }
-  }
-
-  createFeatureTests(
-    `
-    Feature: Hello
-      Scenario: Say hello
-        Given I say hello
-
-      Scenario: Say hello again
-        Given I say hello
-    `,
-    [HelloSteps]
-  );
-
-  await mockTests.run();
-
-  expect(instances.length).toBe(2);
-  expect(instances[0]).toBe(instances[1]);
 });
 
 test("injections in before each ara available in steps", async () => {

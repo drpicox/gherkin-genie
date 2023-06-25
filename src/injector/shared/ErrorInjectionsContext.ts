@@ -7,6 +7,10 @@ export class ErrorInjectionsContext implements InjectionContext {
     this.#message = message;
   }
 
+  has<T>(InjectionClass: new () => T): boolean {
+    return false;
+  }
+
   get<T>(InjectionClass: new () => T): T {
     throw new Error(this.#message);
   }

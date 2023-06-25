@@ -19,6 +19,10 @@ export class StepDefinitionsContext implements InjectionContext {
     );
   }
 
+  has<T>(InjectionClass: new () => T): boolean {
+    return this.#injectionsContext.has(InjectionClass);
+  }
+
   async runMethod(step: ExtendedStep, stepArgument: any) {
     const stepMethod = this.#stepMethods[step.matchName];
 

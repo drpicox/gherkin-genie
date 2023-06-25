@@ -41,13 +41,13 @@ class FruitSteps {
 }
 
 // Having all steps in one array
-wish("./GetStepDefinitions.feature", [AppleSteps, OrangeSteps, FruitSteps]);
+wish("./WishStepDefinitions.feature", [AppleSteps, OrangeSteps, FruitSteps]);
 
 // Having steps grouped in arrays
 const appleSteps = [AppleSteps];
 const orangeSteps = [OrangeSteps];
 const fruitSteps = [FruitSteps, appleSteps, orangeSteps];
-wish("./GetStepDefinitions.feature", [fruitSteps]);
+wish("./WishStepDefinitions.feature", [fruitSteps]);
 
 // Letting get to automatically find steps
-wish("./GetStepDefinitions.feature", [FruitSteps]);
+wish("./WishStepDefinitions.feature", [FruitSteps]);

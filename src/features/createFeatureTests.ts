@@ -26,11 +26,7 @@ export function createFeatureTests(
   const stepDefinitionsContext = new StepDefinitionsContext();
   currentInjectionContext.setCurrent(stepDefinitionsContext);
   stepDefinitionsContext.getAll(stepDefinitionClasses);
-  currentInjectionContext.setCurrent(
-    new ErrorInjectionsContext(
-      "You can only wish for getting other StepDefinitions instances inside a StepDefinitionsClass constructor while creating feature tests"
-    )
-  );
+  currentInjectionContext.resetCurrent();
 
   verifySteps(stepDefinitionsContext, pickles);
 

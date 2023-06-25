@@ -1,4 +1,4 @@
-import { StepDefinitions } from "../StepDefinitions";
+import { StepDefinitions } from "../../StepDefinitions";
 
 export class StepMethodContext {
   #matchName: string;

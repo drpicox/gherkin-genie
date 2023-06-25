@@ -28,9 +28,10 @@ See [examples](examples) for more details.
   * [Scenario Outlines](#scenario-outlines)
 - [Using Other Step Definitions](#using-other-step-definitions)
   * [Using multiple step definitions](#using-multiple-step-definitions)
-  * [Getting other step definitions](#getting-other-step-definitions)
+  * [Wishing other step definitions](#wishing-other-step-definitions)
   * [Auto-injecting other step definitions](#auto-injecting-other-step-definitions)
-  * [`get` restriction](#get-restriction)
+  * [Wishing for other helper instances](#wishing-for-other-helper-instances)
+  * [The wish for step restriction](#the-wish-for-step-restriction)
 - [Configuration](#configuration)
   * [Custom test runners](#custom-test-runners)
 - [Demo](#demo)
@@ -420,7 +421,7 @@ wish("./Fruits.feature", [AppleSteps, OrangeSteps, FruitSteps]);
 
 In this case, the step definitions are merged together.
 
-### Getting other step definitions
+### Wishing other step definitions
 
 You can get the step definitions instances by using the `get` function.
 It allows you to use them in other steps.
@@ -501,16 +502,83 @@ Because FruitSteps uses the `get` function to obtain
 the `AppleSteps` and `OrangeSteps` instances,
 their step definitions are automatically injected into the test.
 
-### `get` restriction
+### Wishing for other helper instances
 
-The `get` function only works inside the class constructor, and only
-while the class is being instantiated by the `wish` function.
+You can wish for the singleton instance of any class
+once you test have been started.
 
-It is not possible to use the `get` function in the step definitions methods.
+The difference between those instance and the steps
+instances is that these are short liven, they only
+live inside each test (Scenario).
+
+```feature
+Feature: Apples
+
+  Scenario: I can count how many apples we have
+    Given I have 3 apples
+    And you have 5 apples
+    Then we should have 8 apples
+```
+
+```ts
+import { wish } from "gherkin-genie";
+
+class AppleCounter {
+  #count: number = 0;
+
+  add(apples: number) {
+    this.#count += apples;
+  }
+
+  getCount() {
+    return this.#count;
+  }
+}
+
+class AppleSteps {
+  #appleCounter: AppleCounter;
+
+  beforeEach() {
+    this.#appleCounter = wish(AppleCounter);
+  }
+
+  givenIHaveNApples(apples: number) {
+    this.#appleCounter.add(apples);
+  }
+
+  givenYouHaveNApples(apples: number) {
+    this.#appleCounter.add(apples);
+  }
+
+  thenWeShouldHaveNApples(fruits: number) {
+    expect(this.#appleCounter.getCount()).toBe(fruits);
+  }
+}
+
+wish("./WishInstances.feature", [AppleSteps]);
+```
+
+### The wish for step restriction
+
+All wishes for step instances outside the constructors will be
+considered test helper instances and its steps will not be activated.
+
+So for example, given the example of fruits:
+
+```feature
+Feature: Fruits
+
+  Scenario: We can mix several fruits
+    Given I have 3 apples
+    And I have 2 oranges
+    Then I should have 5 fruits
+```
+
+This code will make it fail:
 
 ```ts
 // ❌ WRONG "FruitSteps.ts"
-import { get } from "gherkin-genie";
+import { wish } from "gherkin-genie";
 import { AppleSteps } from "./AppleSteps";
 import { OrangeSteps } from "./OrangeSteps";
 
@@ -523,7 +591,9 @@ class FruitSteps {
 }
 ```
 
-This will throw an error.
+This will throw an error while creating tests because,
+unless we inject in the wish array AppleSteps and OrangeSteps,
+the steps for apples and oranges will be missing.
 
 ## Configuration
 

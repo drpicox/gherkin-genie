@@ -1,4 +1,4 @@
-import { InjectionContext } from "./InjectionContext";
+import { InjectionContext } from "../InjectionContext";
 
 export class ErrorInjectionsContext implements InjectionContext {
   #message: string;

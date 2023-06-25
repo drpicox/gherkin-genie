@@ -2,13 +2,13 @@ const { createFeatureTests, wish } = require("../index");
 const { createOneStepTest } = require("./utils/createOneStepTest");
 const { configureMockTest } = require("./utils/configureMockTest");
 
-let mockTests;
+let mockTests: ReturnType<typeof configureMockTest>;
 beforeEach(() => {
   mockTests = configureMockTest();
 });
 
 test("adding twice the same StepDefinitionsClass ignores the second one", async () => {
-  const log = [];
+  const log: string[] = [];
   class HelloSteps {
     givenIAmRunningAGherkinTest() {
       log.push("Hello");
@@ -27,30 +27,30 @@ test("adding twice the same StepDefinitionsClass ignores the second one", async 
 });
 
 test("can get other step instances", async () => {
-  const log = [];
+  const log: (string | number)[] = [];
 
   class ApplesSteps {
     count = 0;
-    givenIHaveNApples(n) {
+    givenIHaveNApples(n: number) {
       this.count = n;
     }
   }
   class BananasSteps {
     count = 0;
-    givenIHaveNBananas(n) {
+    givenIHaveNBananas(n: number) {
       this.count = n;
     }
   }
   class FruitSteps {
-    #applesSteps;
-    #bananasSteps;
+    #applesSteps: ApplesSteps;
+    #bananasSteps: BananasSteps;
 
     constructor() {
       this.#applesSteps = wish(ApplesSteps);
       this.#bananasSteps = wish(BananasSteps);
     }
 
-    thenIShouldHaveNFruits(expected) {
+    thenIShouldHaveNFruits(expected: number) {
       const total = this.#applesSteps.count + this.#bananasSteps.count;
       log.push("Total", total, "Expected", expected);
     }
@@ -72,17 +72,17 @@ test("can get other step instances", async () => {
 });
 
 test("it instances StepDefinitionClasses not added but getted", async () => {
-  const log = [];
+  const log: (string | number)[] = [];
 
   class ApplesSteps {
     count = 0;
-    givenIHaveNApples(n) {
+    givenIHaveNApples(n: number) {
       this.count = n;
     }
   }
   class BananasSteps {
     count = 0;
-    givenIHaveNBananas(n) {
+    givenIHaveNBananas(n: number) {
       this.count = n;
     }
   }
@@ -95,7 +95,7 @@ test("it instances StepDefinitionClasses not added but getted", async () => {
       this.#bananasSteps = wish(BananasSteps);
     }
 
-    thenIShouldHaveNFruits(expected) {
+    thenIShouldHaveNFruits(expected: number) {
       const total = this.#applesSteps.count + this.#bananasSteps.count;
       log.push("Total", total, "Expected", expected);
     }
@@ -116,12 +116,10 @@ test("it instances StepDefinitionClasses not added but getted", async () => {
   expect(log).toEqual(["Total", 5, "Expected", 5]);
 });
 
-test("cannot use get outside a constructor", () => {
+test("cannot use get outside a constructor or a test", () => {
   class ApplesSteps {}
 
-  expect(() => wish(ApplesSteps)).toThrow(
-    /You can only .* inside a StepDefinitionsClass constructor/
-  );
+  expect(() => wish(ApplesSteps)).toThrow(/No current injection context/i);
 });
 
 test("cannot use get before creating tests", () => {
@@ -132,18 +130,14 @@ test("cannot use get before creating tests", () => {
     }
   }
 
-  expect(() => new FruitSteps()).toThrow(
-    /You can only .* while creating feature tests/
-  );
+  expect(() => new FruitSteps()).toThrow(/No current injection context/i);
 });
 
 test("cannot use get after creating tests", () => {
   class ApplesSteps {}
 
   createFeatureTests("", [ApplesSteps]);
-  expect(() => wish(ApplesSteps)).toThrow(
-    /You can only .* while creating feature tests/
-  );
+  expect(() => wish(ApplesSteps)).toThrow(/No current injection context/i);
 });
 
 test("cannot get with circular dependencies", () => {
@@ -175,4 +169,49 @@ test("cannot get itself", () => {
 
   expect(() => new ApplesSteps()).toThrow("Circular dependency detected");
   expect(() => new ApplesSteps()).toThrow("ApplesSteps -> ApplesSteps");
+});
+
+test("all tests share the same steps injections", async () => {
+  let instances: HelloSteps[] = [];
+
+  class HelloSteps {
+    givenISayHello() {
+      instances.push(this);
+    }
+  }
+
+  createFeatureTests(
+    `
+    Feature: Hello
+      Scenario: Say hello
+        Given I say hello
+
+      Scenario: Say hello again
+        Given I say hello        
+  `,
+    [HelloSteps]
+  );
+
+  await mockTests.run();
+
+  expect(instances.length).toBe(2);
+  expect(instances[0]).toBe(instances[1]);
+});
+
+test("each test from different createTests have different steps injections", async () => {
+  let instances: HelloSteps[] = [];
+
+  class HelloSteps {
+    givenISayHello() {
+      instances.push(this);
+    }
+  }
+
+  createOneStepTest("Given I say hello", [HelloSteps]);
+  createOneStepTest("Given I say hello", [HelloSteps]);
+
+  await mockTests.run();
+
+  expect(instances.length).toBe(2);
+  expect(instances[0]).not.toBe(instances[1]);
 });

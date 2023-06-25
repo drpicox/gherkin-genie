@@ -1,4 +1,6 @@
-export class SingleInjectionsContext {
+import { InjectionContext } from "../InjectionContext";
+
+export class SingleInjectionsContext implements InjectionContext {
   #instances: Map<new () => any, any> = new Map();
   #instanceStack: any[] = [];
 

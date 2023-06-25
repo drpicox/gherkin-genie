@@ -1,10 +1,8 @@
-import { ExtendedStep } from "../features/ExtendedStep";
-import { StepDefinitions, StepDefinitionsClass } from "../StepDefinitions";
+import { ExtendedStep } from "../../features/ExtendedStep";
+import { StepDefinitions, StepDefinitionsClass } from "../../StepDefinitions";
+import { SingleInjectionsContext } from "../shared/SingleInjectionsContext";
+import { InjectionContext } from "../InjectionContext";
 import { StepMethodContext } from "./StepMethodContext";
-import { SingleInjectionsContext } from "./SingleInjectionsContext";
-import { InjectionContext } from "./InjectionContext";
-
-type GetFn = <T>(stepDefinitionsClass: new () => T) => T;
 
 export class StepDefinitionsContext implements InjectionContext {
   #stepMethods: { [matchName: string]: StepMethodContext } = {};

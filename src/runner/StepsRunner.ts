@@ -1,6 +1,7 @@
-import { StepDefinitionsContext } from "../injector/StepDefinitionsContext";
+import { StepDefinitionsContext, TestInjectionsContext } from "../injector";
 import { ExtendedPickle } from "../features/ExtendedPickle";
 import { ExtendedStep } from "../features/ExtendedStep";
+import { SingleInjectionsContext, currentInjectionContext } from "../injector";
 
 const chalk = require("chalk");
 
@@ -14,6 +15,9 @@ export class StepsRunner {
   async run(pickle: ExtendedPickle) {
     let firstError;
     let stepIndex = -1;
+    currentInjectionContext.setCurrent(
+      new TestInjectionsContext(this.#stepsInstances)
+    );
 
     try {
       try {
@@ -49,6 +53,8 @@ export class StepsRunner {
       this.#decorateError(e, pickle, stepIndex);
 
       throw e;
+    } finally {
+      currentInjectionContext.resetCurrent();
     }
   }
 

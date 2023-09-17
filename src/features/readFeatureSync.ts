@@ -7,7 +7,7 @@ export function readFeatureSync(featurePath: string) {
   return feature;
 }
 
-function getAbsolutePath(relativePath: string) {
+export function getAbsolutePath(relativePath: string) {
   const isAlreadyAbsolute =
     !relativePath.startsWith("./") && !relativePath.startsWith("../");
   if (isAlreadyAbsolute) return relativePath;
@@ -17,7 +17,8 @@ function getAbsolutePath(relativePath: string) {
 
   // The calling script should be the fourth element in the stack trace array
   // You might need to adjust the index depending on the specifics of your setup
-  const callerScriptPath = stackTrace[4].match(/\((.*):\d+:\d+\)$/)[1];
+  const callerScriptPath = (stackTrace[4].match(/^\s+at\s(.*):\d+:\d+$/) ||
+    stackTrace[4].match(/\((.*):\d+:\d+\)$/))[1];
 
   // Use path.dirname to get the directory of the calling script
   const callerScriptDir = path.dirname(callerScriptPath);
